@@ -14,8 +14,6 @@ matplotlib.rc('font', **font)
 from matplotlib import pyplot as plt
 
 from scipy.stats import mode as statmode
-from sklearn.metrics import mean_squared_error
-from sklearn.metrics import mean_absolute_error
 from timedataframe import TimeDataFrame
 
 class AD:
