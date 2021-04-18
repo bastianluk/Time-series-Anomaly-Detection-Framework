@@ -1,22 +1,11 @@
 import os
 import sys
 import argparse
-
-path = './'
-exclude = [".git", "__pycache__", "node_modules", "ui", "js", "css", "data"]
-DIRS = [x[0] for x in os.walk(path)]
-for d in DIRS:
-    split_d = d.split('/')
-    common = list(set(split_d).intersection(exclude))
-    if len(common) < 1:
-        sys.path.append(d+'/')
-
 from timedataframe import TimeDataFrame
 from framework import TAF
 
 def input():
     ap = argparse.ArgumentParser()
-    ap.add_argument("-t", "--tsfile", help="path to timeseries file ( in CSV format-> ['Time', 'Value'] )", required=True)
     ap.add_argument("-f", "--tsfreq", help="timeseries frequency", required=True)
     ap.add_argument("-m", "--method", help="threshold selection method", default='automatic')
     ap.add_argument("-s", "--seasonality", help="list of seasonality", default='automatic')
@@ -33,7 +22,9 @@ def preprocess_seasonality():
 if __name__ == "__main__":
     args = input()
     try:
-        TDF = TimeDataFrame(args['tsfile'])
+        # Get from API.
+        dataDict = {}
+        TDF = TimeDataFrame(dataDict)
         ts = TDF.fetch_series(TDF.fetch_keys()[1]) # assumed CSV format ['Time', 'Value']
     except Exception as e:
         print('Error: {}'.format(e))
