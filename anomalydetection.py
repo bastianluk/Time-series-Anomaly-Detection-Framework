@@ -36,7 +36,7 @@ class AD:
     def preprocess(self):
         self.df['diff'] = self.df['value'].diff()
         self.df['wvs'] = 0
-        self.df['qd'] = 0        
+        self.df['qd'] = 0
         self.df['q1'] = 0
         self.df['q3'] = 0
         self.df['diff_q1'] = 0
@@ -59,7 +59,7 @@ class AD:
                 day_df = self._qd(day_df)
                 day_df = self._diff_qd(day_df)
                 all_days.append(day_df)
-            
+
             self.new_df = pd.concat(all_days)
             self.new_df = self.new_df.sort_values('oi').set_index('oi').reset_index(drop=True)
             self._adjust_diff_qd()
@@ -74,7 +74,7 @@ class AD:
         elif self.season == 'HOURLY':
             # HOURLY seasonality score calculation goes here
             pass
-        
+
         elif self.season == 'MONTHLY':
             # MONTHLY seasonality score calculation goes here
             pass
@@ -82,19 +82,19 @@ class AD:
         self._wvs()
         self.write()
 
-    def add_interval_column(self, row): 
+    def add_interval_column(self, row):
         return str(row['time']).split(" ")[1]
 
     def _wvs(self):
         self.new_df['wvs'] = self.new_df.apply(self._set_wv, axis=1)
-    
+
     def _set_wv(self, row):
         wv = 0
         if row['value'] < 0:
             wv = self.default_wvs
-            
+
         return wv
-        
+
     def _qd(self, day_df):
         day_df['interval'] = day_df[['time']].apply(self.add_interval_column, axis=1)
         intervals = day_df['interval'].unique().tolist()
@@ -103,7 +103,7 @@ class AD:
             interval_df = day_df[day_df['interval'] == interval]
             q1, q3 = np.percentile(interval_df[interval_df['value'] > -1]['value'].dropna().values, [25, 75])
             interval_df['q1'] = q1
-            interval_df['q3'] = q3 
+            interval_df['q3'] = q3
             interval_df['qd'] = interval_df.apply(self._set_qd, axis=1)
             all_intervals.append(interval_df)
 
@@ -128,7 +128,7 @@ class AD:
             interval_df = day_df[day_df['interval'] == interval]
             q1, q3 = np.percentile(interval_df['diff'].dropna().values, [25, 75])
             interval_df['diff_q1'] = q1
-            interval_df['diff_q3'] = q3 
+            interval_df['diff_q3'] = q3
             interval_df['diff_qd'] = interval_df.apply(self._set_diff_qd, axis=1)
             all_intervals.append(interval_df)
 
