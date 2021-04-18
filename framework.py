@@ -35,7 +35,7 @@ class TAF:
 
 
     def detect_anomalies(self):
-        
+
         extreme_an_df = self.anomaly_df[self.anomaly_df['wvs'] == self.range[1] + 1]['value']
         point_an_df = 0
         diff_an_df = 0
@@ -57,7 +57,7 @@ class TAF:
             only_point_an_df = point_an_df[point_an_df['dqd_mz'] <= 3.5]
             only_diff_an_df = diff_an_df[diff_an_df['qd_mz'] <= 3.5]
 
-        
+
         print('ds_anomaly = {}, dds_anomaly = {}, common_anomaly = {}, extreme_anomalies = {}'.format(len(only_point_an_df), len(only_diff_an_df), len(point_an_df) - len(only_point_an_df), len(extreme_an_df)) )
 
 
@@ -80,14 +80,14 @@ class TAF:
             block_end = len(raw_df)
             if int(an_index[j] - data_points / 2) >= 0:
                 block_start = int(an_index[j] - data_points / 2)
-            
+
             if int(an_index[j] + data_points / 2) <= len(raw_df):
                 block_end = int(an_index[j] + data_points / 2)
 
             print('{}, {}, {}'.format(block_start, block_end, an_index[j]))
 
             try:
-                
+
                 temp_df = raw_df[block_start:block_end]
                 temp_df = temp_df.reset_index(drop=True)
 
@@ -98,7 +98,7 @@ class TAF:
                         range_low.append(temp_df.loc[i]['diff_q1'])
                         threshold_high.append(temp_df.loc[i]['diff_q3'] + threshold)
                         threshold_low.append(temp_df.loc[i]['diff_q1'] - threshold)
-                    else: 
+                    else:
                         range_high.append(temp_df.loc[i]['q3'])
                         range_low.append(temp_df.loc[i]['q1'])
                         threshold_high.append(temp_df.loc[i]['q3'] + threshold)
@@ -107,7 +107,7 @@ class TAF:
                     wvs.append(temp_df.loc[i]['wvs'])
                     qd.append(temp_df.loc[i]['qd'])
                     dqd.append(temp_df.loc[i]['diff_qd'])
-                
+
                 splts[j][0].fill_between(index, range_high, range_low, color='lightblue', alpha=0.8, label='Normal Behavior (1st to 3rd quartile)')
                 temp_df[val_col].plot(ax=splts[j][0], color='green')
                 s = temp_df[temp_df['oi'] == an_index[j]][val_col]
@@ -121,8 +121,8 @@ class TAF:
 
             except:
                 print('Error: out of boundary expception occurred in searching...')
-            
-            
+
+
             # show the cluster this data point belongs to
             day = raw_df[raw_df['oi'] == an_index[j]]['day'].values.tolist()[0]
             interval = raw_df[raw_df['oi'] == an_index[j]]['interval'].values.tolist()[0]
@@ -133,13 +133,13 @@ class TAF:
             splts[j][1].scatter(y = cluster_df[val_col].values, x = cluster_df.index.values, color='mediumslateblue')
             q1, q3 = np.percentile(cluster_df[cluster_df['value'] > -1][val_col].dropna().values, [25, 75])
             splts[j][1].fill_between([v for v in range(len(cluster_df))], [q3 for v in range(len(cluster_df))], [q1 for v in range(len(cluster_df))], color="lightblue", alpha=0.8, label='Normal Behavior')
-            
+
             # mark the data point
             anomaly_series = cluster_df[cluster_df['oi'] == an_index[j]][val_col]
             splts[j][1].scatter(y=anomaly_series.values, x = anomaly_series.index.values, color='red', label='Anomaly')
             splts[j][1].grid(True)
-            
-            
+
+
         plt.subplots_adjust(top=0.94,bottom=0.075,left=0.04,right=0.97,hspace=0.285,wspace=0.095)
         f.suptitle('Current threshold {}, # of anomalies detected {}'.format(threshold, anomaly_count))
         plt.show()
@@ -151,7 +151,7 @@ class TAF:
         elif score_type == 'DDS':
             col = 'diff_qd'
             value_col = 'diff'
-        
+
         threshold_high = raw_df.describe()[col]['max']
         threshold_low = 0
         valid_threshold = 0
@@ -170,7 +170,7 @@ class TAF:
             data_points = 100
             self._detailed_plot(raw_df, col, value_col, closest_five, data_points, threshold_mean, anomaly_count)
             choice = input('Do you think most of the red points are outliers? (y / n): ')
-            
+
             if choice == 'y':
                 intermediate_results.append({'threshold': threshold_mean, 'anomalies': len(an_list)})
                 threshold_high = threshold_mean
@@ -179,10 +179,10 @@ class TAF:
                 break
             else:
                 threshold_low = threshold_mean
-                
+
         return valid_threshold, intermediate_results
 
-    def _calculate_mz(self):        
+    def _calculate_mz(self):
         self.anomaly_df['qd_mz'] = 0
         series = self.anomaly_df[self.anomaly_df['qd'] > 0]['qd'].dropna().values.tolist()
         med = np.median(series)
@@ -244,12 +244,12 @@ class TAF:
 
         for ind in copy_df['day'].unique().tolist():
             temp = copy_df[copy_df['day'] == ind] # ind = 'monday', 'tuesday', 'wednesday', 'thursday'
-            all_s = [] 
+            all_s = []
             for i in temp['interval'].unique().tolist(): # 0-> 00:00, 1 -> 00:15
                 s = temp[temp['interval'] == i]['value']
                 # print(s)
                 all_s.append(s.dropna().values.tolist())
-            
+
             Y.append(all_s)
 
         ticks = df['interval'].unique().tolist()
@@ -267,7 +267,7 @@ class TAF:
         insignificant = 0
         C = 0
         for d in range(len(X)):
-            D = X[d] 
+            D = X[d]
             var_D = np.var(D, ddof=1)
 
             # 3. create blocks and collect all D_i
@@ -283,9 +283,9 @@ class TAF:
                     deg_D_i = len(D_i) - 1
                     critical_val_low = f.ppf(q=alpha/2, dfn=deg_D, dfd=deg_D_i)
                     critical_val_high = f.ppf(q=1 - alpha/2, dfn=deg_D, dfd=deg_D_i)
-                    
+
                     fstat_sample = var_D / var_D_i
-                    
+
                     if (fstat_sample < critical_val_low) | (fstat_sample > critical_val_high):
                         c = c + 1
                     else:
@@ -298,7 +298,7 @@ class TAF:
             c_collector.append(c)
             if c > int(len(Y)/2):
                 C = C + 1
-        
+
         #print(C)
         winner = ''
         if C > int(len(X)/2):

@@ -44,4 +44,3 @@ if __name__ == "__main__":
     taf.calc_scores()
     taf.threshold_selection()
     taf.detect_anomalies()
-    
