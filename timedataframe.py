@@ -6,27 +6,13 @@ import datetime as d
 
 class TimeDataFrame:
 
-    def __init__(self, file, type='csv', time_key='Time'):
-        self.file = file
-        self.fileType = type
+    def __init__(self, valuesDict, time_key='ts'):
         self.time_key = time_key
-        self.load()
-
-    def load(self):
-        self.data_frame = pd.read_csv(self.file)
+        self.data_frame = pd.DataFrame(valuesDict, columns=[time_key, 'value'])
         self.keys = self.data_frame.keys().values
-
-    def reset(self, file, type='csv', time_key='Time'):
-        self.file = file
-        self.fileType = type
-        self.time_key = time_key
-        self.load()
 
     def get_time_key(self):
         return self.time_key
-
-    def get_file(self):
-        return self.file
 
     def fetch_keys(self):
         return self.keys
@@ -50,7 +36,7 @@ class TimeDataFrame:
         day_df = day_df[day_df.Day == day].reset_index()
         day_df.columns = ['OrigIndex', 'Time', 'Value', 'Day']
         return day_df['Value']
-    
+
     def daily_sum(self, key):
         new_series = dict()
         u_series = self.fetch_series(key).fillna(0)
